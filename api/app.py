@@ -64,5 +64,9 @@ def home():
     return render_template("index.html", prediction=prediction,rq=rq,mae=mae,rmse=rmse)
 
 
+#if __name__ == "__main__":
+#    app.run(debug=True, port=5001)
+
+# This is important for Vercel
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    app.run()
