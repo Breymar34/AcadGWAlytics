@@ -8,7 +8,7 @@ app = Flask(__name__)
 #converter
 import pickle, requests
 from io import BytesIO
-url = "https://drive.google.com/file/d/1F6sh6HeXVcqHlVrW1JQ2dTzH9sIYFGV2/view?usp=sharing"
+url = "https://drive.google.com/uc?export=download&id=1F6sh6HeXVcqHlVrW1JQ2dTzH9sIYFGV2"
 model_bundle = pickle.load(BytesIO(requests.get(url).content))
 
 
