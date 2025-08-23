@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AcadGWAlytics : Academic Data Mining Analytics for GWA Prediction</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.png') }}">
+  <style>
+    /* Spinner overlay */
+    #loadingOverlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(255,255,255,0.8);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+    /* Modal polish */
+    .result-header {
+      background: linear-gradient(135deg, #0d6efd, #4dabf7);
+      color: #fff;
+    }
+    .metric-box {
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 1rem;
+      padding: 1rem;
+      background: #f8f9fa;
+    }
+    .custom-brand {
+     font-family: 'Poppins', sans-serif; /* or your preferred font */
+     color: #0d6efd; /* Bootstrap primary color */
+     font-weight: 700;
+    
+    /* Enhanced 3D / embossed effect */
+    text-shadow:
+      1px 1px 0 #ffffff,   /* top-left highlight */
+      2px 2px 2px rgba(0,0,0,0.3), /* first shadow layer */
+      3px 3px 3px rgba(0,0,0,0.3), /* second shadow layer */
+      4px 4px 4px rgba(0,0,0,0.3), /* third shadow layer */
+      5px 5px 5px rgba(0,0,0,0.2); /* soft outer shadow */
+
+      color: inherit !important;   /* keep same color */
+      text-decoration: none !important; /* remove underline */
+      cursor: default; /* removes pointer hand */
+    }
+  </style>
+</head>
+<body class="bg-light">
+  <!-- Top bar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
+  <div class="container-fluid">
+    <!-- Brand with Logo -->
+    <a class="navbar-brand d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="GWA Predictor" width="90" height="70" class="d-inline-block align-text-top me-2">
+      <span class="custom-brand h5 mb-0">Academic Data Mining Analytics for GWA Prediction</span>
+    </a>
+
+    <!-- Toggler Button for Mobile -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Navbar Links -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link text-primary fw-semibold" href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">
+            <i class="bi bi-info-circle-fill me-1"></i> About
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+ <hr>
+<!-- About / Credits Modal -->
+<div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow-lg border-0 rounded-4">
+      <div class="modal-header bg-info text-white rounded-top-4">
+        <h5 class="modal-title" id="aboutModalLabel">About This App</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <p><strong>AcadGWAlytics : Academic Data Mining Analytics for GWA Prediction</strong></p>
+        <p>This web application helps predict the General Weighted Average (GWA) of students based on their academic records, entrance exam scores, and background information. It uses a linear regression model to generate predictions and provides performance metrics such as R², RMSE, and MAE.</p>
+        <hr>
+        <p class="mb-1"><strong>Credits:</strong></p>
+        <ul class="mb-0">
+          <li>Author / Researcher: <em>Ma.Concepcion R. Repalam</em></li>
+          <li>Framework: Bootstrap 5</li>
+          <li>Backend: Flask (Python)</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+  <div class="container py-5 mt-5">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-8">
+        <div class="card shadow-sm border-0 rounded-4">
+          <div class="card-body p-4">
+
+            {# --- We removed the inline alert results. Results will now appear in a modal. --- #}
+            {% if error %}
+              <div class="alert alert-danger mt-2 mb-0">
+                {{ error }}
+              </div>
+            {% endif %}
+
+            <h2 class="h4 text-primary mb-3">Student Information</h2>
+
+            <form id="gwaForm" method="POST" action="/" class="row g-3 needs-validation" novalidate>
+              <!-- Gender -->
+              <div class="col-md-6">
+                <label for="gender" class="form-label">Gender</label>
+                <select class="form-select" name="gender" id="gender" required>
+                  <option value="">Choose...</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+                <div class="invalid-feedback">Please select a gender.</div>
+              </div>
+
+              <!-- School Attended -->
+              <div class="col-md-6">
+                <label for="school_attended" class="form-label">School Attended</label>
+                <select class="form-select" name="school_attended" id="school_attended" required>
+                  <option value="">Choose...</option>
+                  <option value="Private">Private</option>
+                  <option value="Public">Public</option>
+                </select>
+                <div class="invalid-feedback">Please select a school type.</div>
+              </div>
+
+              <!-- Academic Track -->
+              <div class="col-md-6">
+                <label for="track" class="form-label">Senior High School – Academic Track</label>
+                <select class="form-select" name="track" id="track" required>
+                  <option value="">Choose...</option>
+                  <option value="ABM">ABM</option>
+                  <option value="BASICED">BASIC ED</option>
+                  <option value="GAS">GAS</option>
+                  <option value="HUMSS">HUMSS</option>
+                  <option value="STEM">STEM</option>
+                  <option value="TVL">TVL</option>
+                </select>
+                <div class="invalid-feedback">Please select a track.</div>
+              </div>
+
+              <!-- Course -->
+              <div class="col-md-6">
+                <label for="course" class="form-label">Preferred Course</label>
+                <select class="form-select" name="course" id="course" required>
+                  <option value="">Choose...</option>
+                  <option value="BEEd">BEEd – Elem. Education</option>
+                  <option value="BPEd">BPEd – Physical Education</option>
+                  <option value="BSA">BSA – Accountancy</option>
+                  <option value="BSBA">BSBA – Business Administration</option>
+                  <option value="BSBio">BSBio – Biology</option>
+                  <option value="BSCS">BSCS – Computer Science</option>
+                  <option value="BSCpE">BSCpE – Computer Engineering</option>
+                  <option value="BSCrim">BSCrim – Criminology</option>
+                  <option value="BSECE">BSECE – Electronics Engineering</option>
+                  <option value="BSEE">BSEE – Electrical Engineering</option>
+                  <option value="BSEd">BSEd – Secondary Education</option>
+                  <option value="BSHM">BSHM – Hospitality Management</option>
+                  <option value="BSIT">BSIT – Information Technology</option>
+                  <option value="BSInfo">BSInfo – Information Science</option>
+                  <option value="BSOA">BSOA – Office Administration</option>
+                  <option value="BSPsych">BSPsych – Psychology</option>
+                  <option value="BSTM">BSTM – Tourism Management</option>
+                  <option value="BTLEd">BTLEd – Tech & Livelihood Ed.</option>
+                  <option value="BTVTEd">BTVTEd – Tech-Voc Teacher Ed.</option>
+                </select>
+                <div class="invalid-feedback">Please select a course.</div>
+              </div>
+
+              <hr class="mt-4">
+              <h2 class="h4 text-primary mt-2">Academic Records</h2>
+
+              <!-- Grades -->
+              <div class="col-md-6">
+                <label for="SHS_ENGLISH" class="form-label">Senior High School – English Grade</label>
+                <input type="number" class="form-control" name="SHS_ENGLISH" id="SHS_ENGLISH"
+                       step="0.01" min="50" max="100" placeholder="e.g., 88.50" required>
+                <div class="invalid-feedback">Please enter a valid grade between 50–100.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="SHS_MATH" class="form-label">Senior High School – Mathematics Grade</label>
+                <input type="number" class="form-control" name="SHS_MATH" id="SHS_MATH"
+                       step="0.01" min="50" max="100" placeholder="e.g., 90.00" required>
+                <div class="invalid-feedback">Please enter a valid grade between 50–100.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="SHS_SCIENCE" class="form-label">Senior High School – Science Grade</label>
+                <input type="number" class="form-control" name="SHS_SCIENCE" id="SHS_SCIENCE"
+                       step="0.01" min="50" max="100" placeholder="e.g., 91.25" required>
+                <div class="invalid-feedback">Please enter a valid grade between 50–100.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="SHS_GRADE" class="form-label">Senior High School – General Average</label>
+                <input type="number" class="form-control" name="SHS_GRADE" id="SHS_GRADE"
+                       step="0.01" min="50" max="100" placeholder="e.g., 89.30" required>
+                <div class="invalid-feedback">Please enter a valid grade between 50–100.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="EXAM" class="form-label">Entrance Exam Score</label>
+                <input type="number" class="form-control" name="EXAM" id="EXAM"
+                       step="0.01" min="0" max="100" placeholder="e.g., 75.00" required>
+                <div class="invalid-feedback">Please enter a valid score between 0–100.</div>
+              </div>
+
+              <!-- Submit -->
+              <div class="col-12 d-grid mt-2">
+                <button type="submit" class="btn btn-primary btn-lg">
+                  <i class="bi bi-calculator"></i> Predict General Weighted Average (GWA)
+                </button>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spinner Overlay -->
+  <div id="loadingOverlay">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Prediction Result Modal -->
+  <div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content shadow-lg border-0 rounded-4">
+        <div class="modal-header result-header rounded-top-4">
+          <h5 class="modal-title" id="resultModalLabel">Prediction Results</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+
+          {% if prediction %}
+            {# Clamp to 1.0–5.0 #}
+            {% if prediction < 1.0 %}{% set prediction = 1.0 %}{% elif prediction > 5.0 %}{% set prediction = 5.0 %}{% endif %}
+
+            {# Equivalent (retain your original interpretation and ranges) #}
+            {% set equivalent = '' %}
+            {% set badge_class = 'bg-secondary' %}
+            {% if prediction >= 1.0 and prediction <= 1.25 %}
+              {% set equivalent = 'Excellent' %}
+              {% set badge_class = 'bg-success' %}
+            {% elif prediction >= 1.26 and prediction <= 1.75 %}
+              {% set equivalent = 'Very Satisfactory' %}
+              {% set badge_class = 'bg-success' %}
+            {% elif prediction >= 1.76 and prediction <= 2.25 %}
+              {% set equivalent = 'Satisfactory' %}
+              {% set badge_class = 'bg-primary' %}
+            {% elif prediction >= 2.26 and prediction <= 3.0 %}
+              {% set equivalent = 'Fairly Satisfactory' %}
+              {% set badge_class = 'bg-warning text-dark' %}
+            {% elif prediction >= 3.1 and prediction <= 4.0 %}
+              {% set equivalent = 'Conditional Failure' %}
+              {% set badge_class = 'bg-danger' %}
+            {% elif prediction >= 4.1 %}
+              {% set equivalent = 'Failed' %}
+              {% set badge_class = 'bg-dark' %}
+            {% endif %}
+
+            <!-- Top: value + equivalent -->
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+              <div>
+                <div class="text-muted small">Predicted General Weighted Average (GWA)</div>
+                <div class="display-5 fw-bold text-dark">{{ "%.2f"|format(prediction) }}</div>
+              </div>
+              <div class="text-end">
+                <span class="badge {{ badge_class }} fs-6 rounded-pill px-3 py-2">{{ equivalent }}</span>
+              </div>
+            </div>
+
+            <!-- Visual scale: 1.0 best -> 5.0 worst -->
+            <div class="mt-3">
+              <div class="progress" style="height: 10px;">
+                <div class="progress-bar" role="progressbar"
+                     style="width: {{ ((5 - prediction) / 4 * 100) | round(0) }}%"
+                     aria-valuenow="{{ prediction }}" aria-valuemin="1" aria-valuemax="5"></div>
+              </div>
+              <div class="d-flex justify-content-between small text-muted mt-1">
+                <span>Best (1.0)</span><span>3.0</span><span>Worst (5.0)</span>
+              </div>
+            </div>
+
+            <hr class="my-4">
+
+            <!-- Metrics -->
+            <div class="row g-3 text-center">
+              {% if rq is not none %}
+                <div class="col-12 col-sm-4">
+                  <div class="metric-box">
+                    <div class="small text-muted">R²</div>
+                    <div class="h5 mb-0">{{ "%.3f"|format(rq) }}</div>
+                  </div>
+                </div>
+              {% endif %}
+              {% if rmse is not none %}
+                <div class="col-12 col-sm-4">
+                  <div class="metric-box">
+                    <div class="small text-muted">RMSE</div>
+                    <div class="h5 mb-0">{{ "%.3f"|format(rmse) }}</div>
+                  </div>
+                </div>
+              {% endif %}
+              {% if mae is not none %}
+                <div class="col-12 col-sm-4">
+                  <div class="metric-box">
+                    <div class="small text-muted">MAE</div>
+                    <div class="h5 mb-0">{{ "%.3f"|format(mae) }}</div>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+
+          {% else %}
+            <p class="text-muted mb-0">No prediction yet. Fill out the form and submit to see results.</p>
+          {% endif %}
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap + Custom Validation JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Bootstrap custom validation + spinner
+    (function () {
+      'use strict';
+      const form = document.getElementById('gwaForm');
+      const overlay = document.getElementById('loadingOverlay');
+
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        } else {
+          overlay.style.display = 'flex'; // show spinner during submission
+        }
+        form.classList.add('was-validated');
+      }, false);
+    })();
+
+    // Auto-open modal when a prediction exists (after server response)
+    document.addEventListener('DOMContentLoaded', function () {
+      const hasPrediction = {{ 'true' if (prediction is defined and prediction is not none) else 'false' }};
+      if (hasPrediction) {
+        const modalEl = document.getElementById('resultModal');
+        const resultModal = new bootstrap.Modal(modalEl, {keyboard: true});
+        resultModal.show();
+      }
+    });
+  </script>
+</body>
+</html>
