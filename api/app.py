@@ -1,18 +1,10 @@
 from flask import Flask, render_template, request
 import joblib
 
-
 app = Flask(__name__)
 #model = joblib.load("gwa_model_edited.pkl")
 
-#converter
-import pickle, requests
-from io import BytesIO
-url = "https://drive.google.com/uc?export=download&id=1F6sh6HeXVcqHlVrW1JQ2dTzH9sIYFGV2"
-model_bundle = pickle.load(BytesIO(requests.get(url).content))
-
-
-#model_bundle = joblib.load("gwa_model_edited.pkl")
+model_bundle = joblib.load("gwa_model_edited.pkl")
 model = model_bundle["model"]
 metrics = model_bundle["metrics"]
 
