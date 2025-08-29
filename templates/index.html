@@ -31,21 +31,18 @@
       background: #f8f9fa;
     }
     .custom-brand {
-     font-family: 'Poppins', sans-serif; /* or your preferred font */
-     color: #0d6efd; /* Bootstrap primary color */
+     font-family: 'Poppins', sans-serif;
+     color: #0d6efd;
      font-weight: 700;
-    
-    /* Enhanced 3D / embossed effect */
-    text-shadow:
-      1px 1px 0 #ffffff,   /* top-left highlight */
-      2px 2px 2px rgba(0,0,0,0.3), /* first shadow layer */
-      3px 3px 3px rgba(0,0,0,0.3), /* second shadow layer */
-      4px 4px 4px rgba(0,0,0,0.3), /* third shadow layer */
-      5px 5px 5px rgba(0,0,0,0.2); /* soft outer shadow */
-
-      color: inherit !important;   /* keep same color */
-      text-decoration: none !important; /* remove underline */
-      cursor: default; /* removes pointer hand */
+      text-shadow:
+        1px 1px 0 #ffffff,
+        2px 2px 2px rgba(0,0,0,0.3),
+        3px 3px 3px rgba(0,0,0,0.3),
+        4px 4px 4px rgba(0,0,0,0.3),
+        5px 5px 5px rgba(0,0,0,0.2);
+      color: inherit !important;
+      text-decoration: none !important;
+      cursor: default;
     }
   </style>
 </head>
@@ -78,7 +75,8 @@
   </div>
 </nav>
 
- <hr>
+<hr>
+
 <!-- About / Credits Modal -->
 <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -89,7 +87,7 @@
       </div>
       <div class="modal-body p-4">
         <p><strong>AcadGWAlytics : Academic Data Mining Analytics for GWA Prediction</strong></p>
-        <p>AcadGWAlytics is an intelligent companion for academic forecasting. AcadGWAlytics utilizes advanced analytics and machine learning to generate personalized success forecasts based on a range of academic variables, including subject-specific grades, entrance exam scores, and other pre-admission requirements.</p>
+        <p>AcadGWAlytics utilizes advanced analytics and machine learning to generate personalized success forecasts based on academic variables including subject-specific grades, entrance exam scores, and other pre-admission requirements.</p>
         <hr>
         <p class="mb-1"><strong>Credits:</strong></p>
         <ul class="mb-0">
@@ -111,7 +109,6 @@
         <div class="card shadow-sm border-0 rounded-4">
           <div class="card-body p-4">
 
-            {# --- We removed the inline alert results. Results will now appear in a modal. --- #}
             {% if error %}
               <div class="alert alert-danger mt-2 mb-0">
                 {{ error }}
@@ -126,8 +123,8 @@
                 <label for="gender" class="form-label">Gender</label>
                 <select class="form-select" name="gender" id="gender" required>
                   <option value="">Choose...</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
+                  <option value="Male" {% if request.form.get('gender') == 'Male' %}selected{% endif %}>Male</option>
+                  <option value="Female" {% if request.form.get('gender') == 'Female' %}selected{% endif %}>Female</option>
                 </select>
                 <div class="invalid-feedback">Please select a gender.</div>
               </div>
@@ -137,8 +134,8 @@
                 <label for="school_attended" class="form-label">School Attended</label>
                 <select class="form-select" name="school_attended" id="school_attended" required>
                   <option value="">Choose...</option>
-                  <option value="Private">Private</option>
-                  <option value="Public">Public</option>
+                  <option value="Private" {% if request.form.get('school_attended') == 'Private' %}selected{% endif %}>Private</option>
+                  <option value="Public" {% if request.form.get('school_attended') == 'Public' %}selected{% endif %}>Public</option>
                 </select>
                 <div class="invalid-feedback">Please select a school type.</div>
               </div>
@@ -147,13 +144,12 @@
               <div class="col-md-6">
                 <label for="track" class="form-label">Senior High School – Academic Track</label>
                 <select class="form-select" name="track" id="track" required>
-                  <option value="">Choose...</option>
-                  <option value="ABM">ABM</option>
-                  <option value="BASICED">BASIC ED</option>
-                  <option value="GAS">GAS</option>
-                  <option value="HUMSS">HUMSS</option>
-                  <option value="STEM">STEM</option>
-                  <option value="TVL">TVL</option>
+                  <option value="" disabled {% if not request.form.get('track') %}selected{% endif %}>--Select Track--</option>
+                  <option value="STEM" {% if request.form.get('track') == 'STEM' %}selected{% endif %}>STEM</option>
+                  <option value="ABM" {% if request.form.get('track') == 'ABM' %}selected{% endif %}>ABM</option>
+                  <option value="HUMSS" {% if request.form.get('track') == 'HUMSS' %}selected{% endif %}>HUMSS</option>
+                  <option value="GAS" {% if request.form.get('track') == 'GAS' %}selected{% endif %}>GAS</option>
+                  <option value="TVL" {% if request.form.get('track') == 'TVL' %}selected{% endif %}>TVL
                 </select>
                 <div class="invalid-feedback">Please select a track.</div>
               </div>
@@ -162,27 +158,19 @@
               <div class="col-md-6">
                 <label for="course" class="form-label">Preferred Course</label>
                 <select class="form-select" name="course" id="course" required>
-                  <option value="">Choose...</option>
-                  <option value="BEEd">BEEd – Elem. Education</option>
-                  <option value="BPEd">BPEd – Physical Education</option>
-                  <option value="BSA">BSA – Accountancy</option>
-                  <option value="BSBA">BSBA – Business Administration</option>
-                  <option value="BSBio">BSBio – Biology</option>
-                  <option value="BSCS">BSCS – Computer Science</option>
-                  <option value="BSCpE">BSCpE – Computer Engineering</option>
-                  <option value="BSCrim">BSCrim – Criminology</option>
-                  <option value="BSECE">BSECE – Electronics Engineering</option>
-                  <option value="BSEE">BSEE – Electrical Engineering</option>
-                  <option value="BSEd">BSEd – Secondary Education</option>
-                  <option value="BSHM">BSHM – Hospitality Management</option>
-                  <option value="BSIT">BSIT – Information Technology</option>
-                  <option value="BSInfo">BSInfo – Information Science</option>
-                  <option value="BSOA">BSOA – Office Administration</option>
-                  <option value="BSPsych">BSPsych – Psychology</option>
-                  <option value="BSTM">BSTM – Tourism Management</option>
-                  <option value="BTLEd">BTLEd – Tech & Livelihood Ed.</option>
-                  <option value="BTVTEd">BTVTEd – Tech-Voc Teacher Ed.</option>
+                  <option value="" disabled {% if not request.form.get('course') %}selected{% endif %}>--Select Course--</option>
+                  <option value="BSIT" {% if request.form.get('course') == 'BSIT' %}selected{% endif %}>Bachelor of Science in Information Technology (BSIT)</option>
+                  <option value="BSCS" {% if request.form.get('course') == 'BSCS' %}selected{% endif %}>Bachelor of Science in Computer Science (BSCS)</option>
+                  <option value="BSIS" {% if request.form.get('course') == 'BSIS' %}selected{% endif %}>Bachelor of Science in Information Systems (BSIS)</option>
+                  <option value="BSECE" {% if request.form.get('course') == 'BSECE' %}selected{% endif %}>Bachelor of Science in Electronics and Communications Engineering (BSECE)</option>
+                  <option value="BSEE" {% if request.form.get('course') == 'BSEE' %}selected{% endif %}>Bachelor of Science in Electrical Engineering (BSEE)</option>
+                  <option value="BSME" {% if request.form.get('course') == 'BSME' %}selected{% endif %}>Bachelor of Science in Mechanical Engineering (BSME)</option>
+                  <option value="BSBA" {% if request.form.get('course') == 'BSBA' %}selected{% endif %}>Bachelor of Science in Business Administration (BSBA)</option>
+                  <option value="BSA" {% if request.form.get('course') == 'BSA' %}selected{% endif %}>Bachelor of Science in Accountancy (BSA)</option>
+                  <option value="BSED" {% if request.form.get('course') == 'BSED' %}selected{% endif %}>Bachelor of Secondary Education (BSED)</option>
+                  <option value="BEED" {% if request.form.get('course') == 'BEED' %}selected{% endif %}>Bachelor of Elementary Education (BEED)</option>
                 </select>
+
                 <div class="invalid-feedback">Please select a course.</div>
               </div>
 
@@ -193,42 +181,52 @@
               <div class="col-md-6">
                 <label for="SHS_ENGLISH" class="form-label">Senior High School – English Grade</label>
                 <input type="number" class="form-control" name="SHS_ENGLISH" id="SHS_ENGLISH"
-                       step="0.01" min="50" max="100" placeholder="e.g., 88.50" required>
+                       step="0.01" min="50" max="100" placeholder="e.g., 88.50"
+                       value="{{ form_data.get('SHS_ENGLISH','') }}" required>
                 <div class="invalid-feedback">Please enter a valid grade between 50–100.</div>
               </div>
 
               <div class="col-md-6">
                 <label for="SHS_MATH" class="form-label">Senior High School – Mathematics Grade</label>
                 <input type="number" class="form-control" name="SHS_MATH" id="SHS_MATH"
-                       step="0.01" min="50" max="100" placeholder="e.g., 90.00" required>
+                       step="0.01" min="50" max="100" placeholder="e.g., 90.00"
+                       value="{{ form_data.get('SHS_MATH','') }}" required>
                 <div class="invalid-feedback">Please enter a valid grade between 50–100.</div>
               </div>
 
               <div class="col-md-6">
                 <label for="SHS_SCIENCE" class="form-label">Senior High School – Science Grade</label>
                 <input type="number" class="form-control" name="SHS_SCIENCE" id="SHS_SCIENCE"
-                       step="0.01" min="50" max="100" placeholder="e.g., 91.25" required>
+                       step="0.01" min="50" max="100" placeholder="e.g., 91.25"
+                       value="{{ form_data.get('SHS_SCIENCE','') }}" required>
                 <div class="invalid-feedback">Please enter a valid grade between 50–100.</div>
               </div>
 
               <div class="col-md-6">
                 <label for="SHS_GRADE" class="form-label">Senior High School – General Average</label>
                 <input type="number" class="form-control" name="SHS_GRADE" id="SHS_GRADE"
-                       step="0.01" min="50" max="100" placeholder="e.g., 89.30" required>
+                       step="0.01" min="50" max="100" placeholder="e.g., 89.30"
+                       value="{{ form_data.get('SHS_GRADE','') }}" required>
                 <div class="invalid-feedback">Please enter a valid grade between 50–100.</div>
               </div>
 
               <div class="col-md-6">
                 <label for="EXAM" class="form-label">Entrance Exam Score</label>
                 <input type="number" class="form-control" name="EXAM" id="EXAM"
-                       step="0.01" min="0" max="100" placeholder="e.g., 75.00" required>
+                       step="0.01" min="0" max="100" placeholder="e.g., 75.00"
+                       value="{{ form_data.get('EXAM','') }}" required>
                 <div class="invalid-feedback">Please enter a valid score between 0–100.</div>
               </div>
 
-              <!-- Submit -->
-              <div class="col-12 d-grid mt-2">
+              <!-- Submit & Clear Buttons -->
+              <div class="col-12 d-flex gap-2 mt-3">
                 <button type="submit" class="btn btn-primary btn-lg">
                   <i class="bi bi-calculator"></i> Predict General Weighted Average (GWA)
+                </button>
+
+                <!-- JS-driven: clears all inputs to blank (not revert to value attr) -->
+                <button type="button" id="clearBtn" class="btn btn-outline-secondary btn-lg">
+                  <i class="bi bi-x-circle"></i> Clear All
                 </button>
               </div>
 
@@ -258,10 +256,8 @@
         <div class="modal-body p-4">
 
           {% if prediction %}
-            {# Clamp to 1.0–5.0 #}
             {% if prediction < 1.0 %}{% set prediction = 1.0 %}{% elif prediction > 5.0 %}{% set prediction = 5.0 %}{% endif %}
 
-            {# Equivalent (retain your original interpretation and ranges) #}
             {% set equivalent = '' %}
             {% set badge_class = 'bg-secondary' %}
             {% if prediction >= 1.0 and prediction <= 1.25 %}
@@ -284,7 +280,7 @@
               {% set badge_class = 'bg-dark' %}
             {% endif %}
 
-            <!-- Top: value + equivalent -->
+            
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
               <div>
                 <div class="text-muted small">Predicted General Weighted Average (GWA)</div>
@@ -295,7 +291,6 @@
               </div>
             </div>
 
-            <!-- Visual scale: 1.0 best -> 5.0 worst -->
             <div class="mt-3">
               <div class="progress" style="height: 10px;">
                 <div class="progress-bar" role="progressbar"
@@ -307,9 +302,56 @@
               </div>
             </div>
 
-            <hr class="my-4">
+            {% set suggestions = [] %}
+            {% if equivalent == 'Excellent' %}
+              {% set suggestions = [
+                "Maintain your current study habits and consistency.",
+                "Challenge yourself with advanced learning materials.",
+                "Consider mentoring classmates or joining academic competitions."
+              ] %}
+            {% elif equivalent == 'Very Satisfactory' %}
+              {% set suggestions = [
+                "Keep up the good work and stay consistent.",
+                "Review lessons regularly to move towards excellence.",
+                "Participate in study groups to strengthen weak areas."
+              ] %}
+            {% elif equivalent == 'Satisfactory' %}
+              {% set suggestions = [
+                "Improve time management to allow more study hours.",
+                "Seek clarification from teachers when concepts are unclear.",
+                "Use practice tests or quizzes to reinforce learning."
+              ] %}
+            {% elif equivalent == 'Fairly Satisfactory' %}
+              {% set suggestions = [
+                "Allocate extra time for difficult subjects.",
+                "Create a weekly study schedule and stick to it.",
+                "Avoid procrastination and limit distractions (e.g., social media)."
+              ] %}
+            {% elif equivalent == 'Conditional Failure' %}
+              {% set suggestions = [
+                "Consult teachers or tutors for one-on-one guidance.",
+                "Focus on mastering core concepts before moving forward.",
+                "Form study groups for collaborative learning."
+              ] %}
+            {% elif equivalent == 'Failed' %}
+              {% set suggestions = [
+                "Reassess your study strategies and environment.",
+                "Seek academic support services (tutorials, peer mentoring).",
+                "Develop discipline with structured daily study habits.",
+                "Consider reducing non-academic commitments to focus on studies."
+              ] %}
+            {% endif %}
 
-            <!-- Metrics -->
+            <div class="mt-4">
+              <h6 class="fw-bold">Suggestions for Improvement</h6>
+              <ul class="list-group">
+                {% for tip in suggestions %}
+                  <li class="list-group-item">{{ tip }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+
+            <hr class="my-4">
             <div class="row g-3 text-center">
               {% if rq is not none %}
                 <div class="col-12 col-sm-4">
@@ -336,6 +378,16 @@
                 </div>
               {% endif %}
             </div>
+            <div class="row mt-4">
+            <div class="col-12">
+              <div class="alert alert-info text-start" role="alert">
+                <h6 class="fw-bold">Understanding the Metrics:</h6>
+                <p><strong>R² (R-Squared):</strong> This tells us how well the prediction matches the actual student grades. A value closer to 1 means the prediction is very accurate.</p>
+                <p><strong>RMSE (Root Mean Square Error):</strong> This shows the average size of the prediction mistakes. Lower values mean the predictions are closer to the real grades.</p>
+                <p><strong>MAE (Mean Absolute Error):</strong> This also shows the average error in predictions, but in a simpler way. Like RMSE, smaller numbers mean better accuracy.</p>
+              </div>
+            </div>
+          </div>
 
           {% else %}
             <p class="text-muted mb-0">No prediction yet. Fill out the form and submit to see results.</p>
@@ -349,35 +401,54 @@
     </div>
   </div>
 
-  <!-- Bootstrap + Custom Validation JS -->
+  <!-- Bootstrap bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
   <script>
-    // Bootstrap custom validation + spinner
     (function () {
       'use strict';
       const form = document.getElementById('gwaForm');
       const overlay = document.getElementById('loadingOverlay');
 
+      // Show spinner on submit (server-side POST will reload the page)
       form.addEventListener('submit', function (event) {
         if (!form.checkValidity()) {
           event.preventDefault();
           event.stopPropagation();
         } else {
-          overlay.style.display = 'flex'; // show spinner during submission
+          overlay.style.display = 'flex';
         }
         form.classList.add('was-validated');
       }, false);
-    })();
 
-    // Auto-open modal when a prediction exists (after server response)
-    document.addEventListener('DOMContentLoaded', function () {
+      // Clear All button: clears all inputs/selects/textarea to empty
+      document.getElementById('clearBtn').addEventListener('click', function () {
+        const elements = form.querySelectorAll('input, select, textarea');
+        elements.forEach(el => {
+          if (el.tagName === 'SELECT') {
+            el.selectedIndex = 0;
+          } else if (el.type === 'checkbox' || el.type === 'radio') {
+            el.checked = false;
+          } else {
+            el.value = '';
+          }
+        });
+        form.classList.remove('was-validated');
+
+        // hide result modal if visible
+        const modalEl = document.getElementById('resultModal');
+        const instance = bootstrap.Modal.getInstance(modalEl);
+        if (instance) instance.hide();
+      });
+
+      // Auto-open modal when a prediction exists (after server response)
       const hasPrediction = {{ 'true' if (prediction is defined and prediction is not none) else 'false' }};
       if (hasPrediction) {
         const modalEl = document.getElementById('resultModal');
         const resultModal = new bootstrap.Modal(modalEl, {keyboard: true});
         resultModal.show();
       }
-    });
+    })();
   </script>
 </body>
 </html>
