@@ -122,7 +122,7 @@
               <div class="col-md-6">
                 <label for="gender" class="form-label">Gender</label>
                 <select class="form-select" name="gender" id="gender" required>
-                  <option value="">Choose...</option>
+                  <option value="">--Select Gender--</option>
                   <option value="Male" {% if request.form.get('gender') == 'Male' %}selected{% endif %}>Male</option>
                   <option value="Female" {% if request.form.get('gender') == 'Female' %}selected{% endif %}>Female</option>
                 </select>
@@ -133,7 +133,7 @@
               <div class="col-md-6">
                 <label for="school_attended" class="form-label">School Attended</label>
                 <select class="form-select" name="school_attended" id="school_attended" required>
-                  <option value="">Choose...</option>
+                  <option value="">--Select School Type--</option>
                   <option value="Private" {% if request.form.get('school_attended') == 'Private' %}selected{% endif %}>Private</option>
                   <option value="Public" {% if request.form.get('school_attended') == 'Public' %}selected{% endif %}>Public</option>
                 </select>
@@ -302,54 +302,84 @@
               </div>
             </div>
 
-            {% set suggestions = [] %}
-            {% if equivalent == 'Excellent' %}
-              {% set suggestions = [
-                "Maintain your current study habits and consistency.",
-                "Challenge yourself with advanced learning materials.",
-                "Consider mentoring classmates or joining academic competitions."
-              ] %}
-            {% elif equivalent == 'Very Satisfactory' %}
-              {% set suggestions = [
-                "Keep up the good work and stay consistent.",
-                "Review lessons regularly to move towards excellence.",
-                "Participate in study groups to strengthen weak areas."
-              ] %}
-            {% elif equivalent == 'Satisfactory' %}
-              {% set suggestions = [
-                "Improve time management to allow more study hours.",
-                "Seek clarification from teachers when concepts are unclear.",
-                "Use practice tests or quizzes to reinforce learning."
-              ] %}
-            {% elif equivalent == 'Fairly Satisfactory' %}
-              {% set suggestions = [
-                "Allocate extra time for difficult subjects.",
-                "Create a weekly study schedule and stick to it.",
-                "Avoid procrastination and limit distractions (e.g., social media)."
-              ] %}
-            {% elif equivalent == 'Conditional Failure' %}
-              {% set suggestions = [
-                "Consult teachers or tutors for one-on-one guidance.",
-                "Focus on mastering core concepts before moving forward.",
-                "Form study groups for collaborative learning."
-              ] %}
-            {% elif equivalent == 'Failed' %}
-              {% set suggestions = [
-                "Reassess your study strategies and environment.",
-                "Seek academic support services (tutorials, peer mentoring).",
-                "Develop discipline with structured daily study habits.",
-                "Consider reducing non-academic commitments to focus on studies."
-              ] %}
-            {% endif %}
+            {% set suggestion_pool = {
+              'Excellent': [
+                "Sustain your high level of academic discipline and consider pursuing advanced enrichment opportunities.",
+                "Continue to challenge yourself with higher-level materials and independent research.",
+                "Share your expertise by mentoring peers or contributing to academic organizations."
+              ],
+              'Very Satisfactory': [
+                "Maintain consistency in your study habits while seeking opportunities to refine your skills.",
+                "Engage in regular reviews to strengthen subject mastery and aim for higher academic distinction.",
+                "Participate in collaborative learning to deepen understanding and enhance performance."
+              ],
+              'Satisfactory': [
+                "Enhance time management strategies to allocate sufficient focus for academic tasks.",
+                "Seek guidance from instructors when clarification is needed to avoid knowledge gaps.",
+                "Apply structured practice through self-assessments to reinforce comprehension."
+              ],
+              'Fairly Satisfactory': [
+                "Dedicate additional study time to subjects requiring greater attention.",
+                "Develop and adhere to a structured weekly learning plan for consistent progress.",
+                "Minimize distractions and create a conducive environment for effective study."
+              ],
+              'Conditional Failure': [
+                "Seek proactive consultation with faculty or academic mentors to address learning challenges.",
+                "Prioritize core competencies before advancing to more complex topics.",
+                "Utilize peer support and collaborative learning to strengthen comprehension."
+              ],
+              'Failed': [
+                "Reevaluate and adjust study approaches to establish more effective learning strategies.",
+                "Seek academic assistance programs such as tutorials, mentoring, or study clinics.",
+                "Develop a disciplined daily study routine focused on fundamental skills.",
+                "Temporarily reduce non-academic engagements to prioritize academic recovery."
+              ]
+            } %}
+
+            {# Color mapping based on equivalent #}
+            {% set color_map = {
+              'Excellent': 'success',
+              'Very Satisfactory': 'primary',
+              'Satisfactory': 'info',
+              'Fairly Satisfactory': 'warning',
+              'Conditional Failure': 'warning',
+              'Failed': 'danger'
+            } %}
+
+            {% set pool = suggestion_pool.get(equivalent, []) | unique | list %}
+            {% set suggestion = pool | random %}
+            {% set color = color_map.get(equivalent, 'secondary') %}
+
+            {# Random display style #}
+            {% set styles = ['card', 'alert', 'list'] %}
+            {% set style = styles | random %}
 
             <div class="mt-4">
-              <h6 class="fw-bold">Suggestions for Improvement</h6>
-              <ul class="list-group">
-                {% for tip in suggestions %}
-                  <li class="list-group-item">{{ tip }}</li>
-                {% endfor %}
-              </ul>
+              <h6 class="fw-bold">Professional Suggestion for Academic Improvement</h6>
+
+              {% if suggestion %}
+                {% if style == 'card' %}
+                  <div class="card border-{{ color }} shadow-sm rounded-3">
+                    <div class="card-body text-{{ color }}">
+                      <p class="mb-0">{{ suggestion }}</p>
+                    </div>
+                  </div>
+                {% elif style == 'alert' %}
+                  <div class="alert alert-{{ color }} rounded-3 shadow-sm">
+                    {{ suggestion }}
+                  </div>
+                {% elif style == 'list' %}
+                  <ul class="list-group shadow-sm rounded-3">
+                    <li class="list-group-item list-group-item-{{ color }}">
+                      {{ suggestion }}
+                    </li>
+                  </ul>
+                {% endif %}
+              {% else %}
+                <div class="text-muted fst-italic">No suggestion available at this time.</div>
+              {% endif %}
             </div>
+
 
             <hr class="my-4">
             <div class="row g-3 text-center">
@@ -380,7 +410,7 @@
             </div>
             <div class="row mt-4">
             <div class="col-12">
-              <div class="alert alert-info text-start" role="alert">
+              <div class="alert alert-info text-start small" role="alert">
                 <h6 class="fw-bold">Understanding the Metrics:</h6>
                 <p><strong>R² (R-Squared):</strong> This tells us how well the prediction matches the actual student grades. A value closer to 1 means the prediction is very accurate.</p>
                 <p><strong>RMSE (Root Mean Square Error):</strong> This shows the average size of the prediction mistakes. Lower values mean the predictions are closer to the real grades.</p>
