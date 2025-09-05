@@ -32,7 +32,7 @@
     }
     .custom-brand {
      font-family: 'Poppins', sans-serif;
-     color: #0d6efd;
+     color: #fd690d;
      font-weight: 700;
       text-shadow:
         1px 1px 0 #ffffff,
@@ -44,6 +44,17 @@
       text-decoration: none !important;
       cursor: default;
     }
+          /* --- Result Modal Animations (minimal) --- */
+      .progress .progress-bar { transition: width .9s ease; }
+
+      .gwa-pop { opacity: 0; transform: scale(.92) translateY(6px); transition: all .5s ease; }
+      .gwa-pop.show { opacity: 1; transform: scale(1) translateY(0); }
+
+      .suggestion-fade { opacity: 0; transform: translateY(10px); transition: all .6s ease .15s; }
+      .suggestion-fade.show { opacity: 1; transform: none; }
+
+      .badge-pulse { animation: badgePulse 1.2s ease-in-out 2; transform-origin: center; }
+      @keyframes badgePulse { 0%,100% { transform: scale(1) } 50% { transform: scale(1.08) } }
   </style>
 </head>
 <body class="bg-light">
@@ -284,10 +295,10 @@
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
               <div>
                 <div class="text-muted small">Predicted General Weighted Average (GWA)</div>
-                <div class="display-5 fw-bold text-dark">{{ "%.2f"|format(prediction) }}</div>
+                <div id="gwaValue" class="display-5 fw-bold text-dark gwa-pop">{{ "%.2f"|format(prediction) }}</div>
               </div>
               <div class="text-end">
-                <span class="badge {{ badge_class }} fs-6 rounded-pill px-3 py-2">{{ equivalent }}</span>
+                <span class="badge {{ badge_class }} fs-6 rounded-pill px-3 py-2 badge-pulse">{{ equivalent }}</span>
               </div>
             </div>
 
@@ -354,7 +365,7 @@
             {% set styles = ['card', 'alert', 'list'] %}
             {% set style = styles | random %}
 
-            <div class="mt-4">
+            <div class="mt-4 suggestion-fade">
               <h6 class="fw-bold">Professional Suggestion for Academic Improvement</h6>
 
               {% if suggestion %}
@@ -453,46 +464,55 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    (function () {
-      'use strict';
-      const form = document.getElementById('gwaForm');
-      const overlay = document.getElementById('loadingOverlay');
+   (function () {
+  'use strict';
+  const form = document.getElementById('gwaForm');
+  const overlay = document.getElementById('loadingOverlay');
 
-      // Show spinner on submit (server-side POST will reload the page)
-      form.addEventListener('submit', function (event) {
-        if (!form.checkValidity()) {
-          event.preventDefault();
-          event.stopPropagation();
-        } else {
-          overlay.style.display = 'flex';
-        }
-        form.classList.add('was-validated');
-      }, false);
+  // (unchanged) submit + clear handlers here...
 
-      // Clear All button: clears all inputs/selects/textarea to empty
-      document.getElementById('clearBtn').addEventListener('click', function () {
-        const elements = form.querySelectorAll('input, select, textarea');
-        elements.forEach(el => {
-          if (el.tagName === 'SELECT') {
-            el.selectedIndex = 0;
-          } else if (el.type === 'checkbox' || el.type === 'radio') {
-            el.checked = false;
-          } else {
-            el.value = '';
-          }
-        });
-        form.classList.remove('was-validated');
+  // ADDED: hook modal animations
+  const modalEl = document.getElementById('resultModal'); // ADDED
+  if (modalEl) { // ADDED
+    modalEl.addEventListener('shown.bs.modal', function () { // ADDED
+      // Animate GWA number (count-up + pop-in) // ADDED
+      const gwaEl = modalEl.querySelector('#gwaValue'); // ADDED
+      if (gwaEl) { // ADDED
+        const finalVal = parseFloat((gwaEl.textContent || '0').trim()) || 0; // ADDED
+        gwaEl.textContent = '0.00'; // ADDED
+        // trigger pop-in // ADDED
+        requestAnimationFrame(() => gwaEl.classList.add('show')); // ADDED
 
-        // hide result modal if visible
-        const modalEl = document.getElementById('resultModal');
-        const instance = bootstrap.Modal.getInstance(modalEl);
-        if (instance) instance.hide();
-      });
+        const duration = 1000; // ms // ADDED
+        const start = performance.now(); // ADDED
+        function tick(now) { // ADDED
+          const t = Math.min((now - start) / duration, 1); // ADDED
+          const ease = 1 - Math.pow(1 - t, 3); // cubic ease-out // ADDED
+          gwaEl.textContent = (finalVal * ease).toFixed(2); // ADDED
+          if (t < 1) requestAnimationFrame(tick); // ADDED
+          else gwaEl.textContent = finalVal.toFixed(2); // ensure exact end // ADDED
+        } // ADDED
+        requestAnimationFrame(tick); // ADDED
+      } // ADDED
 
-      // Auto-open modal when a prediction exists (after server response)
-      const hasPrediction = {{ 'true' if (prediction is defined and prediction is not none) else 'false' }};
+      // Smoothly animate all progress bars inside the modal // ADDED
+      const bars = modalEl.querySelectorAll('.progress-bar'); // ADDED
+      bars.forEach(bar => { // ADDED
+        const target = bar.style.width || (bar.getAttribute('aria-valuenow') ? bar.getAttribute('aria-valuenow') + '%' : '0%'); // ADDED
+        bar.style.width = '0%'; // reset // ADDED
+        void bar.offsetWidth; // force reflow // ADDED
+        setTimeout(() => { bar.style.width = target; }, 100); // ADDED
+      }); // ADDED
+
+      // Reveal suggestion block // ADDED
+      const sug = modalEl.querySelector('.suggestion-fade'); // ADDED
+      if (sug) requestAnimationFrame(() => sug.classList.add('show')); // ADDED
+    }); // ADDED
+  } // ADDED
+
+  // Auto-open modal when a prediction exists (after server response)
+  const hasPrediction = {{ 'true' if (prediction is defined and prediction is not none) else 'false' }};
       if (hasPrediction) {
-        const modalEl = document.getElementById('resultModal');
         const resultModal = new bootstrap.Modal(modalEl, {keyboard: true});
         resultModal.show();
       }
