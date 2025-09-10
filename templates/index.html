@@ -209,22 +209,21 @@
                 <div class="invalid-feedback">Please enter a valid score between 0–100.</div>
               </div>
 
-              <!-- Submit & Clear Buttons -->
-              <div class="col-12 d-flex gap-2 mt-3">
-                <button type="submit" class="btn btn-primary btn-lg">
+              <!-- Submit, Clear & About Buttons -->
+              <div class="col-12 d-flex flex-column flex-md-row gap-2 mt-3">
+                <button type="submit" class="btn btn-primary btn-lg w-100 w-md-auto">
                   <i class="bi bi-calculator"></i> Predict General Weighted Average (GWA)
                 </button>
 
-                <!-- JS-driven: clears all inputs to blank (not revert to value attr) -->
-                <button type="button" id="clearBtn" class="btn btn-outline-secondary btn-lg">
+                <!-- JS-driven: clears all inputs to blank -->
+                <button type="button" id="clearBtn" class="btn btn-outline-secondary btn-lg w-100 w-md-auto">
                   <i class="bi bi-x-circle"></i> Clear All
                 </button>
 
                 <!-- About Button -->
-                <button type="button" data-bs-toggle="modal" data-bs-target="#aboutModal" class="btn btn-success btn-lg">
+                <button type="button" data-bs-toggle="modal" data-bs-target="#aboutModal" class="btn btn-success btn-lg w-100 w-md-auto">
                   <i class="bi bi-info-circle"></i> About This App
                 </button>
-
               </div>
 
             </form>
