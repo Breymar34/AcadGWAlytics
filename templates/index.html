@@ -59,35 +59,15 @@
 </head>
 <body class="bg-light">
   <!-- Top bar -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
   <div class="container-fluid">
     <!-- Brand with Logo -->
     <a class="navbar-brand d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">
-      <img src="{{ url_for('static', filename='images/logo_gwa.png') }}" alt="GWA Predictor" width="90" height="90" class="d-inline-block align-text-top me-2">
-      <span class="custom-brand h5 mb-0">Academic Data Mining Analytics for GWA Prediction</span>
+      <img src="{{ url_for('static', filename='images/logo_gwa.png') }}" alt="GWA Predictor" height="90" class="d-inline-block align-text-top me-2">
     </a>
-
-    <!-- Toggler Button for Mobile -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <!-- Navbar Links -->
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link text-primary fw-semibold" href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">
-            <i class="bi bi-info-circle-fill me-1"></i> About
-          </a>
-        </li>
-      </ul>
-    </div>
   </div>
 </nav>
-
-<hr>
-
+<hr class="mt-5">
 <!-- About / Credits Modal -->
 <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -114,7 +94,7 @@
   </div>
 </div>
  
-  <div class="container py-5 mt-5">
+  <div class="container py-5 mt-5 pt-4">
     <div class="row justify-content-center">
       <div class="col-12 col-lg-8">
         <div class="card shadow-sm border-0 rounded-4">
@@ -239,6 +219,12 @@
                 <button type="button" id="clearBtn" class="btn btn-outline-secondary btn-lg">
                   <i class="bi bi-x-circle"></i> Clear All
                 </button>
+
+                <!-- About Button -->
+                <button type="button" data-bs-toggle="modal" data-bs-target="#aboutModal" class="btn btn-success btn-lg">
+                  <i class="bi bi-info-circle"></i> About This App
+                </button>
+
               </div>
 
             </form>
@@ -470,6 +456,27 @@
   const overlay = document.getElementById('loadingOverlay');
 
   // (unchanged) submit + clear handlers here...
+  // CLEAR FORM HANDLER
+  const clearBtn = document.getElementById('clearBtn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function () {
+      // Reset the form
+      form.reset();
+
+      // Explicitly clear all inputs and selects (overrides Jinja default values)
+      form.querySelectorAll('input, select').forEach(el => {
+        if (el.tagName === 'SELECT') {
+          el.selectedIndex = 0; // first option
+        } else if (el.type === 'number' || el.type === 'text') {
+          el.value = '';
+        }
+      });
+
+      // Remove validation classes
+      form.classList.remove('was-validated');
+    });
+  }
+
 
   // ADDED: hook modal animations
   const modalEl = document.getElementById('resultModal'); // ADDED
