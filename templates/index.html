@@ -47,6 +47,10 @@
           /* --- Result Modal Animations (minimal) --- */
       .progress .progress-bar { transition: width .9s ease; }
 
+      .progress-bar.bg-success { background: linear-gradient(to right, #00c851, #007e33); }
+      .progress-bar.bg-danger { background: linear-gradient(to right, #ff4444, #cc0000); }
+
+
       .gwa-pop { opacity: 0; transform: scale(.92) translateY(6px); transition: all .5s ease; }
       .gwa-pop.show { opacity: 1; transform: scale(1) translateY(0); }
 
@@ -55,6 +59,23 @@
 
       .badge-pulse { animation: badgePulse 1.2s ease-in-out 2; transform-origin: center; }
       @keyframes badgePulse { 0%,100% { transform: scale(1) } 50% { transform: scale(1.08) } }
+
+      /* Smaller but responsive buttons */
+      .btn-custom {
+        padding: 6px 14px;      /* Decrease padding for smaller height */
+        font-size: 0.9rem;      /* Slightly smaller text */
+        border-radius: 6px;     /* Rounded corners */
+        min-width: 80px;        /* Keeps buttons from becoming too small */
+      }
+
+      /* Ensure responsiveness */
+      @media (max-width: 576px) {
+        .btn-custom {
+          width: 100%;          /* Full width on small screens */
+          margin-bottom: 8px;   /* Add space between stacked buttons */
+        }
+      }
+
   </style>
 </head>
 <body class="bg-light">
@@ -150,9 +171,9 @@
                 <div class="invalid-feedback">Please select a school type.</div>
               </div>
 
-              <!-- Academic Track -->
+              <!-- Academic Strand -->
               <div class="col-md-6">
-                <label for="track" class="form-label">Senior High School – Academic Track</label>
+                <label for="track" class="form-label">Senior High School – Academic Strand</label>
                 <select class="form-select" name="track" id="track" required>
                   <option value="" disabled {% if not request.form.get('track') %}selected{% endif %}>--Select Track--</option>
                   <option value="STEM" {% if request.form.get('track') == 'STEM' %}selected{% endif %}>STEM</option>
@@ -230,22 +251,22 @@
 
               <!-- Submit, Clear & About Buttons -->
               <div class="col-12 d-flex flex-column flex-md-row gap-2 mt-3">
-                <button type="submit" class="btn btn-primary btn-lg w-100 w-md-auto">
+                <button type="submit" class="btn btn-primary btn-lg w-100 w-md-auto btn-custom">
                   <i class="bi bi-calculator"></i> Predict General Weighted Average (GWA)
                 </button>
 
                 <!-- JS-driven: clears all inputs to blank -->
-                <button type="button" id="clearBtn" class="btn btn-warning btn-lg w-100 w-md-auto">
+                <button type="button" id="clearBtn" class="btn btn-warning btn-lg w-100 w-md-auto btn-custom" >
                   <i class="bi bi-x-circle"></i> Clear All
                 </button>
 
                 <!-- About Button -->
-                <button type="button" data-bs-toggle="modal" data-bs-target="#aboutModal" class="btn btn-success btn-lg w-100 w-md-auto">
+                <button type="button" data-bs-toggle="modal" data-bs-target="#aboutModal" class="btn btn-success btn-lg w-100 w-md-auto btn-custom">
                   <i class="bi bi-info-circle"></i> About This App
                 </button>
 
                 <!-- Disclaimer Button -->
-                <button type="button" data-bs-toggle="modal" data-bs-target="#disclaimerModal" class="btn btn-info btn-lg w-100 w-md-auto">
+                <button type="button" data-bs-toggle="modal" data-bs-target="#disclaimerModal" class="btn btn-info btn-lg w-100 w-md-auto btn-custom">
                   <i class="bi bi-info-circle"></i> Disclaimer
                 </button>
               </div>
@@ -265,210 +286,141 @@
     </div>
   </div>
 
-  <!-- Prediction Result Modal -->
-  <div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content shadow-lg border-0 rounded-4">
-        <div class="modal-header result-header rounded-top-4">
-          <h5 class="modal-title" id="resultModalLabel">Prediction Results</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body p-4">
+<!-- Prediction Result Modal -->
+<div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" style="width: 600px;">
+    <div class="modal-content shadow-lg border-0 rounded-4">
+      <div class="modal-header result-header rounded-top-4">
+        <h5 class="modal-title fw-bold" id="resultModalLabel">Prediction Summary & Result</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
 
-          {% if prediction %}
-            {% if prediction < 1.0 %}{% set prediction = 1.0 %}{% elif prediction > 5.0 %}{% set prediction = 5.0 %}{% endif %}
+      <div class="modal-body p-4">
+        {% if prediction %}
+          {% if prediction < 1.0 %}{% set prediction = 1.0 %}
+          {% elif prediction > 5.0 %}{% set prediction = 5.0 %}{% endif %}
 
-            {% set equivalent = '' %}
-            {% set badge_class = 'bg-secondary' %}
-            {% if prediction >= 1.0 and prediction <= 1.25 %}
-              {% set equivalent = 'Excellent' %}
-              {% set badge_class = 'bg-success' %}
-            {% elif prediction >= 1.26 and prediction <= 1.75 %}
-              {% set equivalent = 'Very Satisfactory' %}
-              {% set badge_class = 'bg-success' %}
-            {% elif prediction >= 1.76 and prediction <= 2.25 %}
-              {% set equivalent = 'Satisfactory' %}
-              {% set badge_class = 'bg-primary' %}
-            {% elif prediction >= 2.26 and prediction <= 3.0 %}
-              {% set equivalent = 'Fairly Satisfactory' %}
-              {% set badge_class = 'bg-warning text-dark' %}
-            {% elif prediction >= 3.1 and prediction <= 4.0 %}
-              {% set equivalent = 'Conditional Failure' %}
-              {% set badge_class = 'bg-danger' %}
-            {% elif prediction >= 4.1 %}
-              {% set equivalent = 'Failed' %}
-              {% set badge_class = 'bg-dark' %}
-            {% endif %}
+          {% set equivalent = '' %}
+          {% set badge_class = 'bg-secondary' %}
+          {% if prediction >= 1.0 and prediction <= 1.25 %}
+            {% set equivalent = 'Excellent' %}
+            {% set badge_class = 'bg-success' %}
+          {% elif prediction >= 1.26 and prediction <= 1.75 %}
+            {% set equivalent = 'Very Satisfactory' %}
+            {% set badge_class = 'bg-success' %}
+          {% elif prediction >= 1.76 and prediction <= 2.25 %}
+            {% set equivalent = 'Satisfactory' %}
+            {% set badge_class = 'bg-primary' %}
+          {% elif prediction >= 2.26 and prediction <= 3.0 %}
+            {% set equivalent = 'Fairly Satisfactory' %}
+            {% set badge_class = 'bg-warning text-dark' %}
+          {% elif prediction >= 3.1 and prediction <= 4.0 %}
+            {% set equivalent = 'Conditional Failure' %}
+            {% set badge_class = 'bg-danger' %}
+          {% elif prediction >= 4.01 %}
+            {% set equivalent = 'Failing' %}
+            {% set badge_class = 'bg-dark' %}
+          {% endif %}
 
-            
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-              <div>
-                <div class="text-muted small">Predicted General Weighted Average (GWA)</div>
-                <div id="gwaValue" class="display-5 fw-bold text-dark gwa-pop">{{ "%.2f"|format(prediction) }}</div>
-              </div>
-              <div class="text-end">
-                <span class="badge {{ badge_class }} fs-6 rounded-pill px-3 py-2 badge-pulse">{{ equivalent }}</span>
-              </div>
-            </div>
-
-            <div class="mt-3">
-              <div class="progress" style="height: 10px;">
-                <div class="progress-bar" role="progressbar"
-                     style="width: {{ ((5 - prediction) / 4 * 100) | round(0) }}%"
-                     aria-valuenow="{{ prediction }}" aria-valuemin="1" aria-valuemax="5"></div>
-              </div>
-              <div class="d-flex justify-content-between small text-muted mt-1">
-                <span>Best (1.0)</span><span>3.0</span><span>Worst (5.0)</span>
-              </div>
-            </div>
-
-            {% set suggestion_pool = {
-              'Excellent': [
-                "Sustain your high level of academic discipline and consider pursuing advanced enrichment opportunities.",
-                "Continue to challenge yourself with higher-level materials and independent research.",
-                "Share your expertise by mentoring peers or contributing to academic organizations."
-              ],
-              'Very Satisfactory': [
-                "Maintain consistency in your study habits while seeking opportunities to refine your skills.",
-                "Engage in regular reviews to strengthen subject mastery and aim for higher academic distinction.",
-                "Participate in collaborative learning to deepen understanding and enhance performance."
-              ],
-              'Satisfactory': [
-                "Enhance time management strategies to allocate sufficient focus for academic tasks.",
-                "Seek guidance from instructors when clarification is needed to avoid knowledge gaps.",
-                "Apply structured practice through self-assessments to reinforce comprehension."
-              ],
-              'Fairly Satisfactory': [
-                "Dedicate additional study time to subjects requiring greater attention.",
-                "Develop and adhere to a structured weekly learning plan for consistent progress.",
-                "Minimize distractions and create a conducive environment for effective study."
-              ],
-              'Conditional Failure': [
-                "Seek proactive consultation with faculty or academic mentors to address learning challenges.",
-                "Prioritize core competencies before advancing to more complex topics.",
-                "Utilize peer support and collaborative learning to strengthen comprehension."
-              ],
-              'Failed': [
-                "Reevaluate and adjust study approaches to establish more effective learning strategies.",
-                "Seek academic assistance programs such as tutorials, mentoring, or study clinics.",
-                "Develop a disciplined daily study routine focused on fundamental skills.",
-                "Temporarily reduce non-academic engagements to prioritize academic recovery."
-              ]
-            } %}
-
-            {# Color mapping based on equivalent #}
-            {% set color_map = {
-              'Excellent': 'success',
-              'Very Satisfactory': 'primary',
-              'Satisfactory': 'info',
-              'Fairly Satisfactory': 'warning',
-              'Conditional Failure': 'warning',
-              'Failed': 'danger'
-            } %}
-
-            {% set pool = suggestion_pool.get(equivalent, []) | unique | list %}
-            {% set suggestion = pool | random %}
-            {% set color = color_map.get(equivalent, 'secondary') %}
-
-            {# Random display style #}
-            {% set styles = ['card', 'alert', 'list'] %}
-            {% set style = styles | random %}
-
-            <div class="mt-4 suggestion-fade">
-              <h6 class="fw-bold">Professional Suggestion for Academic Improvement</h6>
-
-              {% if suggestion %}
-                {% if style == 'card' %}
-                  <div class="card border-{{ color }} shadow-sm rounded-3">
-                    <div class="card-body text-{{ color }}">
-                      <p class="mb-0">{{ suggestion }}</p>
-                    </div>
-                  </div>
-                {% elif style == 'alert' %}
-                  <div class="alert alert-{{ color }} rounded-3 shadow-sm">
-                    {{ suggestion }}
-                  </div>
-                {% elif style == 'list' %}
-                  <ul class="list-group shadow-sm rounded-3">
-                    <li class="list-group-item list-group-item-{{ color }}">
-                      {{ suggestion }}
-                    </li>
-                  </ul>
-                {% endif %}
-              {% else %}
-                <div class="text-muted fst-italic">No suggestion available at this time.</div>
-              {% endif %}
-            </div>
-
-
-            <hr class="my-4">
-            <div class="row g-3 text-center">
-              {% if rq is not none %}
-                <div class="col-12 col-sm-4">
-                  <div class="metric-box">
-                    <div class="small text-muted">R²</div>
-                    <div class="h5 mb-0">{{ "%.3f"|format(rq) }}</div>
-                    <div class="progress">
-                    <div class="progress-bar bg-success" role="progressbar" 
-                        style="width: {{ rq * 100 }}%;" 
-                        aria-valuenow="{{ rq * 100 }}" aria-valuemin="0" aria-valuemax="100">
-                    </div>
-                  </div>
-                  </div>
-                </div>
-              {% endif %}
-              {% if rmse is not none %}
-                <div class="col-12 col-sm-4">
-                  <div class="metric-box">
-                    <div class="small text-muted">RMSE</div>
-                    <div class="h5 mb-0">{{ "%.3f"|format(rmse) }}</div>
-                    <div class="progress">
-                    <div class="progress-bar bg-success" role="progressbar" 
-                        style="width: {{ (1 - (rmse / 10)) * 100 }}%;" 
-                        aria-valuenow="{{ (1 - (rmse / 10)) * 100 }}" aria-valuemin="0" aria-valuemax="100">
-                    </div>
-                  </div>
-                  </div>
-                </div>
-              {% endif %}
-              {% if mae is not none %}
-                <div class="col-12 col-sm-4">
-                  <div class="metric-box">
-                    <div class="small text-muted">MAE</div>
-                    <div class="h5 mb-0">{{ "%.3f"|format(mae) }}</div>
-                    <div class="progress">
-                    <div class="progress-bar bg-success" role="progressbar" 
-                        style="width: {{ (1 - (mae / 10)) * 100 }}%;" 
-                        aria-valuenow="{{ (1 - (mae / 10)) * 100 }}" aria-valuemin="0" aria-valuemax="100">
-                    </div>
-                  </div>
-                  </div>
-                </div>
-              {% endif %}
-            </div>
-            <div class="row mt-4">
-            <div class="col-12">
-              <div class="alert alert-info text-start small" role="alert">
-                <h6 class="fw-bold">Understanding the Metrics:</h6>
-                <p><strong>R² (R-Squared):</strong> This tells us how well the prediction matches the actual student grades. A value closer to 1 means the prediction is very accurate.</p>
-                <p><strong>RMSE (Root Mean Square Error):</strong> This shows the average size of the prediction mistakes. Lower values mean the predictions are closer to the real grades.</p>
-                <p><strong>MAE (Mean Absolute Error):</strong> This also shows the average error in predictions, but in a simpler way. Like RMSE, smaller numbers mean better accuracy.</p>
+          <!-- Summary of Inputs -->
+          <div class="mb-4">
+            <h6 class="fw-bold text-primary mb-3">Student Input Summary</h6>
+            <div class="d-flex justify-content-center">
+              <div class="table-responsive" style="max-width: 600px; width: 100%;">
+                <table class="table table-bordered table-striped align-middle rounded-3 overflow-hidden">
+                  <thead class="table-primary">
+                    <tr>
+                      <th>Category</th>
+                      <th>Input</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><strong>Gender</strong></td><td>{{ request.form.get('gender', '-') }}</td></tr>
+                    <tr><td><strong>School Type</strong></td><td>{{ request.form.get('school_attended', '-') }}</td></tr>
+                    <tr><td><strong>Strand</strong></td><td>{{ request.form.get('track', '-') }}</td></tr>
+                    <tr><td><strong>Preferred Course</strong></td><td>{{ request.form.get('course', '-') }}</td></tr>
+                    <tr><td><strong>English Grade</strong></td><td>{{ form_data.get('SHS_ENGLISH','-') }}</td></tr>
+                    <tr><td><strong>Math Grade</strong></td><td>{{ form_data.get('SHS_MATH','-') }}</td></tr>
+                    <tr><td><strong>Science Grade</strong></td><td>{{ form_data.get('SHS_SCIENCE','-') }}</td></tr>
+                    <tr><td><strong>General Average</strong></td><td>{{ form_data.get('SHS_GRADE','-') }}</td></tr>
+                    <tr><td><strong>Entrance Exam Score</strong></td><td>{{ form_data.get('EXAM','-') }}</td></tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
 
-          {% else %}
-            <p class="text-muted mb-0">No prediction yet. Fill out the form and submit to see results.</p>
+          <!-- Prediction Output Section -->
+          <div class="text-center mb-4">
+            <div class="text-muted small">Predicted General Weighted Average (GWA)</div>
+            <div id="gwaValue" class="display-5 fw-bold text-dark gwa-pop">{{ "%.2f"|format(prediction) }}</div>
+            <span class="badge {{ badge_class }} fs-6 rounded-pill px-3 py-2 badge-pulse">{{ equivalent }}</span>
+          </div>
+
+          <!-- Retained Progress Bar -->
+          <div class="progress" style="height: 20px; border-radius: 10px;">
+          <div 
+            class="progress-bar {{ badge_class }} progress-bar-striped progress-bar-animated"
+            role="progressbar" 
+            style="width: {{ ((5 - prediction)/4)*100 }}%" 
+            aria-valuenow="{{ prediction }}" 
+            aria-valuemin="1" 
+            aria-valuemax="5">
+            {{ "%.2f"|format(prediction) }}
+          </div>
+        </div>
+
+
+          <!-- Suggestion Section -->
+          {% set suggestion_pool = {
+            'Excellent': [
+              "Sustain your high level of academic discipline and consider pursuing advanced enrichment opportunities.",
+              "Continue to challenge yourself with higher-level materials and independent research."
+            ],
+            'Very Satisfactory': [
+              "Maintain consistency in your study habits while seeking opportunities to refine your skills.",
+              "Engage in regular reviews to strengthen subject mastery."
+            ],
+            'Satisfactory': [
+              "Enhance time management strategies and seek guidance from instructors to avoid knowledge gaps."
+            ],
+            'Fairly Satisfactory': [
+              "Dedicate additional study time to subjects requiring greater attention and develop a structured plan."
+            ],
+            'Conditional Failure': [
+              "Seek proactive consultation with faculty or academic mentors to address learning challenges."
+            ],
+            'Failing': [
+              "Reevaluate study approaches and seek academic assistance programs to recover performance."
+            ]
+          } %}
+          {% set pool = suggestion_pool.get(equivalent, []) | unique | list %}
+          {% set suggestion = pool | random %}
+
+          {% if suggestion %}
+            <div class="mt-4 suggestion-fade">
+              <h6 class="fw-bold text-primary">Academic Suggestion</h6>
+              <div class="alert alert-info rounded-3 shadow-sm mb-0">
+                {{ suggestion }}
+              </div>
+            </div>
           {% endif %}
 
-        </div>
-        <div class="modal-footer">
-          <button type="button" data-bs-toggle="modal" data-bs-target="#disclaimerModal" class="btn btn-info">View Disclaimer</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
+        {% else %}
+          <p class="text-muted mb-0">No prediction yet. Fill out the form and submit to see results.</p>
+        {% endif %}
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" data-bs-toggle="modal" data-bs-target="#disclaimerModal" class="btn btn-info">
+          View Disclaimer
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
+</div>
+
 
   <!-- Bootstrap bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
