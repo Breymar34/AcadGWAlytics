@@ -357,8 +357,8 @@
             <span class="badge {{ badge_class }} fs-6 rounded-pill px-3 py-2 badge-pulse">{{ equivalent }}</span>
           </div>
 
-          <!-- Retained Progress Bar -->
-          <div class="progress" style="height: 20px; border-radius: 10px;">
+        <!-- Retained Progress Bar -->
+        <div class="progress" style="height: 20px; border-radius: 10px;">
           <div 
             class="progress-bar {{ badge_class }} progress-bar-striped progress-bar-animated"
             role="progressbar" 
@@ -369,6 +369,14 @@
             {{ "%.2f"|format(prediction) }}
           </div>
         </div>
+
+<!-- ✅ Best–Worst Label Below -->
+<div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: bold; margin-top: 5px;">
+  <span>Worst (5.0)</span>
+  <span>Best (1.0)</span>
+</div>
+
+        
 
 
           <!-- Suggestion Section -->
