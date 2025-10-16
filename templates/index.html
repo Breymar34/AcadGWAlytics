@@ -381,27 +381,38 @@
 
           <!-- Suggestion Section -->
           {% set suggestion_pool = {
-            'Excellent': [
-              "Sustain your high level of academic discipline and consider pursuing advanced enrichment opportunities.",
-              "Continue to challenge yourself with higher-level materials and independent research."
-            ],
-            'Very Satisfactory': [
-              "Maintain consistency in your study habits while seeking opportunities to refine your skills.",
-              "Engage in regular reviews to strengthen subject mastery."
-            ],
-            'Satisfactory': [
-              "Enhance time management strategies and seek guidance from instructors to avoid knowledge gaps."
-            ],
-            'Fairly Satisfactory': [
-              "Dedicate additional study time to subjects requiring greater attention and develop a structured plan."
-            ],
-            'Conditional Failure': [
-              "Seek proactive consultation with faculty or academic mentors to address learning challenges."
-            ],
-            'Failing': [
-              "Reevaluate study approaches and seek academic assistance programs to recover performance."
-            ]
-          } %}
+              'Excellent': [
+                "Sustain your high level of academic discipline and consider pursuing advanced enrichment opportunities.",
+                "Continue to challenge yourself with higher-level materials and independent research.",
+                "Share your expertise by mentoring peers or contributing to academic organizations."
+              ],
+              'Very Satisfactory': [
+                "Maintain consistency in your study habits while seeking opportunities to refine your skills.",
+                "Engage in regular reviews to strengthen subject mastery and aim for higher academic distinction.",
+                "Participate in collaborative learning to deepen understanding and enhance performance."
+              ],
+              'Satisfactory': [
+                "Enhance time management strategies to allocate sufficient focus for academic tasks.",
+                "Seek guidance from instructors when clarification is needed to avoid knowledge gaps.",
+                "Apply structured practice through self-assessments to reinforce comprehension."
+              ],
+              'Fairly Satisfactory': [
+                "Dedicate additional study time to subjects requiring greater attention.",
+                "Develop and adhere to a structured weekly learning plan for consistent progress.",
+                "Minimize distractions and create a conducive environment for effective study."
+              ],
+              'Conditional Failure': [
+                "Seek proactive consultation with faculty or academic mentors to address learning challenges.",
+                "Prioritize core competencies before advancing to more complex topics.",
+                "Utilize peer support and collaborative learning to strengthen comprehension."
+              ],
+              'Failed': [
+                "Reevaluate and adjust study approaches to establish more effective learning strategies.",
+                "Seek academic assistance programs such as tutorials, mentoring, or study clinics.",
+                "Develop a disciplined daily study routine focused on fundamental skills.",
+                "Temporarily reduce non-academic engagements to prioritize academic recovery."
+              ]
+            } %}
           {% set pool = suggestion_pool.get(equivalent, []) | unique | list %}
           {% set suggestion = pool | random %}
 
